@@ -2,14 +2,17 @@ package nl.listop.http
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
+
 import scala.io.StdIn
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import spray.json.DefaultJsonProtocol
 
-object Server {
+object Server extends SprayJsonSupport with DefaultJsonProtocol {
   def main(args: Array[String]) {
 
     implicit val system = ActorSystem("my-system")
