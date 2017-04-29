@@ -16,17 +16,24 @@ object Server {
     implicit val materializer = ActorMaterializer()
     // needed for the future flatMap/onComplete in the end
     implicit val executionContext = system.dispatcher
-    val port = 9000
     val route =
       path("hello") {
         get {
           complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
         }
+      } ~
+      path("store") {
+        post {
+          entity(as[List[String]]) {list =>
+            complete(list.mkString(", "))
+          }
+        }
       }
 
     val config = ConfigFactory.load()
+    val port = config.getInt("http.port")
     val bindingFuture = Http().bindAndHandle(route
-        ,config.getString("http.interface"), config.getInt("http.port"))
+        ,config.getString("http.interface"), port)
     println(s"Server online at http://localhost:$port/\nPress RETURN to stop...")
     StdIn.readLine() // let it run until user presses return
     bindingFuture
