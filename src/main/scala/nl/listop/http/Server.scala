@@ -28,7 +28,9 @@ object Server extends SprayJsonSupport with DefaultJsonProtocol {
       path("store") {
         post {
           entity(as[List[String]]) {list =>
-            complete(list.mkString(", "))
+            { val result = list.mkString(", ")
+              println(s"result $result")
+            complete(result) }
           }
         }
       }
