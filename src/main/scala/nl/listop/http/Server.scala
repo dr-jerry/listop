@@ -11,10 +11,10 @@ import scala.io.StdIn
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import nl.listop.domain.ListItem
-import spray.json.DefaultJsonProtocol
+import spray.json.{DefaultJsonProtocol, JsonFormat}
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
-  implicit val itemFormat = jsonFormat2(ListItem)
+  implicit val itemFormat: JsonFormat[ListItem] = lazyFormat(jsonFormat(ListItem, "item", "parent"))
 }
 
 object Server extends JsonSupport {
