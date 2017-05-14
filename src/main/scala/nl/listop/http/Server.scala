@@ -10,9 +10,14 @@ import akka.stream.ActorMaterializer
 import scala.io.StdIn
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import nl.listop.domain.ListItem
 import spray.json.DefaultJsonProtocol
 
-object Server extends SprayJsonSupport with DefaultJsonProtocol {
+trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
+  implicit val itemFormat = jsonFormat2(ListItem)
+}
+
+object Server extends JsonSupport {
   def main(args: Array[String]) {
 
     implicit val system = ActorSystem("my-system")
@@ -27,7 +32,7 @@ object Server extends SprayJsonSupport with DefaultJsonProtocol {
       } ~
       path("store") {
         post {
-          entity(as[List[String]]) {list =>
+          entity(as[List[ListItem]]) {list =>
             { val result = list.mkString(", ")
               println(s"result $result")
             complete(result) }
