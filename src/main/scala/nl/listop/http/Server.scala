@@ -11,6 +11,7 @@ import scala.io.StdIn
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import nl.listop.domain.ListItem
+import org.mongodb.scala.MongoClient
 import spray.json.{DefaultJsonProtocol, JsonFormat}
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
@@ -18,6 +19,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 }
 
 object Server extends JsonSupport {
+  val mongoClient = MongoClient()
   def main(args: Array[String]) {
 
     implicit val system = ActorSystem("my-system")
