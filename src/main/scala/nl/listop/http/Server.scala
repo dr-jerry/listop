@@ -34,8 +34,8 @@ object Server extends JsonSupport {
       } ~
       path("store") {
         post {
-          entity(as[List[ListItem]]) {list =>
-            { val result = list.mkString(", ")
+          entity(as[ListItem]) {list =>
+            { val result = list.toString()
               println(s"result $result")
             complete(result) }
           }
