@@ -14,8 +14,12 @@ import nl.listop.domain.ListItem
 import org.mongodb.scala.MongoClient
 import spray.json.{DefaultJsonProtocol, JsonFormat}
 
+case class Foo(i: Int, foo: Foo)
+
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val itemFormat: JsonFormat[ListItem] = lazyFormat(jsonFormat(ListItem, "item", "parent"))
+  //implicit val fooFormat: JsonFormat[Foo] = lazyFormat(jsonFormat(Foo, "i", "foo"))
+
 }
 
 object Server extends JsonSupport {
@@ -34,8 +38,12 @@ object Server extends JsonSupport {
       } ~
       path("store") {
         post {
-          entity(as[ListItem]) {list =>
-            { val result = list.toString()
+//          entity(as[List[Foo]]) { f =>
+//            println(f.size)
+//            complete("f.i")
+//          }
+          entity(as[List[ListItem]]) {list =>
+            { val result = list.mkString(", ")
               println(s"result $result")
             complete(result) }
           }
