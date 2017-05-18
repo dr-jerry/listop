@@ -15,7 +15,7 @@ import com.typesafe.config.ConfigFactory
 import nl.listop.domain.ListItem
 import org.bson.Document
 import org.mongodb.scala.connection.ClusterSettings
-import org.mongodb.scala.{Completed, MongoClient, MongoClientSettings, MongoCredential, Observer}
+import org.mongodb.scala.{Completed, MongoClient, MongoClientSettings, MongoCollection, MongoCredential, Observer}
 import spray.json.{DefaultJsonProtocol, JsonFormat}
 
 case class Foo(i: Int, foo: Foo)
@@ -39,8 +39,9 @@ object mongo {
 
   def getDatabaseNames(): List[String] = {
     var result = List[String]()
-    var names = mongoClient.listDatabaseNames ();
-    names.subscribe ((s: String) =>  result =  s :: result)
+    var database = mongoClient.getDatabase("test")
+    val collection: MongoCollection[Document] = database.getCollection("test");
+    collection.find().subscribe((user: Document) => result = user.toJson :: result)
     result
   }
 }
