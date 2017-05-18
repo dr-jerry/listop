@@ -41,7 +41,7 @@ object mongo {
     var result = List[String]()
     var database = mongoClient.getDatabase("test")
     val collection: MongoCollection[Document] = database.getCollection("test");
-    collection.find().subscribe((user: Document) => result = user.toJson :: result)
+    collection.find().subscribe((user: Document) => println(user.toJson))
     result
   }
 }
