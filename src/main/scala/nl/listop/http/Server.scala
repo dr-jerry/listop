@@ -14,12 +14,9 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import nl.listop.domain.ListItem
 import org.bson.Document
+import org.mongodb.scala.connection.ClusterSettings
 import org.mongodb.scala.{Completed, MongoClient, MongoClientSettings, MongoCredential, Observer}
 import spray.json.{DefaultJsonProtocol, JsonFormat}
-
-import collection.JavaConverters._
-import scala.collection.mutable
-import org.mongodb.scala
 
 case class Foo(i: Int, foo: Foo)
 
@@ -33,10 +30,13 @@ import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.bson.codecs.configuration.CodecRegistries.{fromRegistries, fromProviders}
 
 object mongo {
-  val server = new ServerAddress("localhost", 27017)
   var creds = new java.util.ArrayList[MongoCredential]
   creds.add(MongoCredential.createCredential("jeroen", "test", Array('n','e', 'o','r','e','j')))
-  var mongoClient =  MongoClient(MongoClientSettings.builder().credentialList(creds).build())
+  var servers = new java.util.ArrayList[ServerAddress]
+  servers.add(new ServerAddress("localhost", 27017))
+  val clusterSettings: ClusterSettings = ClusterSettings.builder.hosts(servers).build()
+  var mongoClient =  MongoClient(MongoClientSettings.builder().credentialList(creds).clusterSettings(clusterSettings).build())
+
   def getDatabaseNames(): List[String] = {
     var result = List[String]()
     var names = mongoClient.listDatabaseNames ();
