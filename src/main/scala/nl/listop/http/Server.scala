@@ -6,13 +6,20 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
+import com.mongodb.ServerAddress
+import com.mongodb.async.client
 
 import scala.io.StdIn
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import nl.listop.domain.ListItem
-import org.mongodb.scala.MongoClient
+import org.bson.Document
+import org.mongodb.scala.{Completed, MongoClient, MongoClientSettings, MongoCredential, Observer}
 import spray.json.{DefaultJsonProtocol, JsonFormat}
+
+import collection.JavaConverters._
+import scala.collection.mutable
+import org.mongodb.scala
 
 case class Foo(i: Int, foo: Foo)
 
@@ -21,6 +28,24 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   //implicit val fooFormat: JsonFormat[Foo] = lazyFormat(jsonFormat(Foo, "i", "foo"))
 
 }
+import org.mongodb.scala.bson.codecs.Macros._
+import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
+import org.bson.codecs.configuration.CodecRegistries.{fromRegistries, fromProviders}
+
+object mongo {
+  val server = new ServerAddress("localhost", 27017)
+  var creds = new java.util.ArrayList[MongoCredential]
+  creds.add(MongoCredential.createCredential("jeroen", "test", Array('n','e', 'o','r','e','j')))
+  var mongoClient =  MongoClient(MongoClientSettings.builder().credentialList(creds).build())
+  def getDatabaseNames(): List[String] = {
+    var result = List[String]()
+    var names = mongoClient.listDatabaseNames ();
+    names.subscribe ((s: String) =>  result =  s :: result)
+    result
+  }
+}
+//
+//val codecRegistry = fromRegistries(fromProviders(classOf[ListItem]), DEFAULT_CODEC_REGISTRY )
 
 object Server extends JsonSupport {
   val mongoClient = MongoClient()
@@ -44,6 +69,7 @@ object Server extends JsonSupport {
 //          }
           entity(as[List[ListItem]]) {list =>
             { val result = list.mkString(", ")
+              println(s"collection: ${mongo.getDatabaseNames().mkString(", ")}")
               println(s"result $result")
             complete(result) }
           }
