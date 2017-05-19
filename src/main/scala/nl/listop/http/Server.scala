@@ -32,7 +32,7 @@ import org.bson.codecs.configuration.CodecRegistries.{fromRegistries, fromProvid
 object mongo {
   var creds = new java.util.ArrayList[MongoCredential]
   creds.add(MongoCredential.createCredential("jeroen", "test", Array('n','e', 'o','r','e','j')))
-  var servers = new java.util.ArrayList[ServerAddress]
+    var servers = new java.util.ArrayList[ServerAddress]
   servers.add(new ServerAddress("localhost", 27017))
   val clusterSettings: ClusterSettings = ClusterSettings.builder.hosts(servers).build()
   var mongoClient =  MongoClient(MongoClientSettings.builder().credentialList(creds).clusterSettings(clusterSettings).build())
@@ -40,7 +40,7 @@ object mongo {
   def getDatabaseNames(): List[String] = {
     var result = List[String]()
     var database = mongoClient.getDatabase("test")
-    val collection: MongoCollection[Document] = database.getCollection("test");
+    val collection: MongoCollection[Document] = database.getCollection("users");
     collection.find().subscribe((user: Document) => println(user.toJson))
     result
   }
